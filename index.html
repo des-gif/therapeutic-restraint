@@ -96,6 +96,16 @@
   .img-slot .tag{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
   .img-slot .ph{font-family:'Fraunces',serif;font-size:22px;margin-top:8px;opacity:.92;max-width:18em}
   .img-slot .hint{font-size:12.5px;opacity:.55;margin-top:14px}
+  .hero .img-slot.photo{padding:0;display:block}
+  .img-slot.photo img{width:100%;height:100%;min-height:430px;object-fit:cover;display:block}
+  /* gallery */
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:42px}
+  .gallery figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);aspect-ratio:16/10;background:var(--bone-2)}
+  .gallery img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s ease}
+  .gallery figure:hover img{transform:scale(1.045)}
+  @media(max-width:880px){.gallery{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.gallery{grid-template-columns:1fr}}
+  .gallery-cta{text-align:center;margin-top:34px}
 
   /* ---------- Sections ---------- */
   section{padding:74px 0}
@@ -236,6 +246,7 @@
     <nav class="nav-links" id="navlinks">
       <a href="#approach">Approach</a>
       <a href="#courses">Courses</a>
+      <a href="#gallery">Gallery</a>
       <a href="#format">Format</a>
       <a href="#reviews">Reviews</a>
       <a href="#contact">Contact</a>
@@ -269,13 +280,8 @@
       </div>
     </div>
     <div class="reveal">
-      <!-- IMAGE SLOT — replace this whole div with: <img src="your-photo.jpg" alt="..."> -->
-      <div class="img-slot">
-        <div>
-          <div class="tag">Your photo here</div>
-          <div class="ph">A warm, real photo of training in practice goes here.</div>
-          <div class="hint">Drop in a JPG of a real session or your team — same as the Harmony Oaks photos.</div>
-        </div>
+      <div class="img-slot photo">
+        <img src="images/training-hero.jpg" alt="Therapeutic physical intervention training in practice — a practitioner using a calm, supportive guided hold." loading="eager">
       </div>
     </div>
   </div>
@@ -314,6 +320,29 @@
       <div class="stat reveal"><div class="big">Flexible</div><div class="lbl">Dates around your rota</div></div>
       <div class="stat reveal"><div class="big">✓</div><div class="lbl">Certificate on completion</div></div>
     </div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section id="gallery">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow">In the room</span>
+      <h2>Training in action.</h2>
+      <p>Controlled, supportive techniques taught hands-on — every method built around least-force, trauma-informed principles.</p>
+    </div>
+    <div class="gallery">
+      <figure class="reveal"><img src="images/training-07.jpg" loading="lazy" alt="Maintaining a safe, supportive distance as part of de-escalation practice."></figure>
+      <figure class="reveal"><img src="images/training-08.jpg" loading="lazy" alt="Supportive hand-on-shoulder guide demonstrated calmly during training."></figure>
+      <figure class="reveal"><img src="images/training-16.jpg" loading="lazy" alt="Calm, supported wrist guide demonstrated during physical intervention training."></figure>
+      <figure class="reveal"><img src="images/training-17.jpg" loading="lazy" alt="Controlled wrist hold practised in a calm, supportive way."></figure>
+      <figure class="reveal"><img src="images/training-13.jpg" loading="lazy" alt="Guided escort technique demonstrated with controlled, supportive contact."></figure>
+      <figure class="reveal"><img src="images/training-09.jpg" loading="lazy" alt="Safe forearm guiding technique demonstrated in a training session."></figure>
+      <figure class="reveal"><img src="images/training-10.jpg" loading="lazy" alt="Practising a safe breakaway and disengagement technique."></figure>
+      <figure class="reveal"><img src="images/training-20.jpg" loading="lazy" alt="Controlled supported-arm technique demonstrated during training."></figure>
+      <figure class="reveal"><img src="images/training-01.jpg" loading="lazy" alt="Supportive guided escort from behind, demonstrated calmly."></figure>
+    </div>
+    <div class="gallery-cta reveal"><a href="gallery.html" class="btn btn-primary">View full gallery →</a></div>
   </div>
 </section>
 
