@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Restraint Log App — Therapeutic Physical Intervention Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --navy:#1c3d72; --navy-deep:#132a52; --ink:#16223f; --amber:#ef9f24;
+  --bg:#f4f6fa; --card:#ffffff; --line:#dce3ee; --muted:#5a6b86;
+  --ok:#1f8a52; --warn:#b5551d; --danger:#c0392b; --teal:#137a7f;
+  --radius:14px; --shadow:0 1px 3px rgba(19,42,82,.08),0 8px 24px rgba(19,42,82,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:Fraunces,Georgia,serif;color:var(--navy);line-height:1.2;margin:0 0 .4em}
+h1{font-size:clamp(1.5rem,4vw,2rem);font-weight:600}
+h2{font-size:clamp(1.25rem,3vw,1.6rem);font-weight:600}
+h3{font-size:1.1rem;font-weight:600}
+a{color:var(--navy)}
+.wrap{max-width:920px;margin:0 auto;padding:0 16px}
+
+/* Header */
+header{background:linear-gradient(135deg,var(--navy-deep),var(--navy));color:#fff;padding:18px 0}
+header h1{color:#fff;margin:0;font-size:1.35rem}
+.brandrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:99px}
+header p{margin:6px 0 0;color:#cdd8ec;font-size:.92rem}
+
+/* Tabs */
+nav.tabs{position:sticky;top:0;z-index:40;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(19,42,82,.04)}
+.tabs-inner{max-width:920px;margin:0 auto;display:flex;gap:2px;overflow-x:auto;padding:0 8px}
+.tab{flex:0 0 auto;border:none;background:none;font-family:Inter,sans-serif;font-size:.9rem;font-weight:600;color:var(--muted);padding:14px 14px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tab:hover{color:var(--navy)}
+.tab.active{color:var(--navy);border-bottom-color:var(--amber)}
+
+main{padding:22px 0 80px}
+.panel{display:none;animation:fade .25s ease}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* Cards & fieldsets */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin:0 0 18px;overflow:hidden}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;cursor:pointer;background:#fbfcfe;border-bottom:1px solid var(--line)}
+.card-head:hover{background:#f6f9ff}
+.card-head .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:var(--navy);color:#fff;font-size:.8rem;font-weight:700;font-family:Inter;margin-right:10px;flex:0 0 auto}
+.card-head h3{margin:0;display:flex;align-items:center;font-size:1.02rem}
+.chev{transition:transform .2s;color:var(--muted);font-size:1.1rem}
+.card.collapsed .card-body{display:none}
+.card.collapsed .chev{transform:rotate(-90deg)}
+.card-body{padding:18px}
+
+label.fld{display:block;margin:0 0 14px}
+label.fld>span{display:block;font-weight:600;font-size:.88rem;margin-bottom:5px;color:var(--ink)}
+.hint{font-size:.82rem;color:var(--muted);margin:-2px 0 8px;font-weight:400}
+input[type=text],input[type=date],input[type=time],input[type=number],input[type=email],select,textarea{
+  width:100%;font-family:Inter,sans-serif;font-size:.95rem;color:var(--ink);padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;transition:border .15s,box-shadow .15s}
+textarea{min-height:84px;resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(28,61,114,.12)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px}
+@media(max-width:620px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* checklists */
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin:6px 0 4px}
+@media(max-width:620px){.checks{grid-template-columns:1fr}}
+.chk{display:flex;align-items:flex-start;gap:9px;font-size:.9rem;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:#fbfcfe;cursor:pointer}
+.chk:hover{border-color:#c3d0e6}
+.chk input{margin-top:2px;width:17px;height:17px;flex:0 0 auto;accent-color:var(--navy)}
+.chk.safety{background:#f3f9f5;border-color:#cfe8d8}
+.chk.safety input{accent-color:var(--ok)}
+
+.yn{display:flex;gap:8px}
+.yn label{flex:1;text-align:center;border:1px solid var(--line);border-radius:9px;padding:8px;font-size:.85rem;font-weight:600;color:var(--muted);cursor:pointer;background:#fff}
+.yn input{display:none}
+.yn input:checked+span{color:#fff}
+.yn label:has(input:checked){background:var(--navy);border-color:var(--navy);color:#fff}
+
+/* buttons */
+.btn{font-family:Inter,sans-serif;font-weight:600;font-size:.92rem;border:none;border-radius:10px;padding:11px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;transition:transform .08s,filter .15s}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--amber);color:#3a2600}
+.btn-primary:hover{filter:brightness(1.04)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy-deep)}
+.btn-ghost{background:#eef2f9;color:var(--navy)}
+.btn-ghost:hover{background:#e2e9f6}
+.btn-danger{background:#fdecea;color:var(--danger)}
+.btn-danger:hover{background:#fadbd8}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+
+.notice{border-radius:11px;padding:13px 16px;font-size:.88rem;margin:0 0 16px;border:1px solid}
+.notice.amber{background:#fff7e9;border-color:#f3dca7;color:#6b4e12}
+.notice.navy{background:#eef3fb;border-color:#cdd9ee;color:#1f3457}
+.notice strong{color:inherit}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:0 0 18px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.stat .n{font-family:Fraunces;font-size:1.7rem;font-weight:600;color:var(--navy);line-height:1}
+.stat .l{font-size:.78rem;color:var(--muted);margin-top:6px;font-weight:500}
+.stat.flag .n{color:var(--warn)}
+
+.entry{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 12px;background:var(--card);box-shadow:var(--shadow)}
+.entry-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.entry h4{margin:0 0 2px;font-size:1rem}
+.entry .meta{font-size:.82rem;color:var(--muted)}
+.pill{display:inline-block;font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:99px;margin:4px 4px 0 0}
+.pill.grey{background:#eef2f8;color:#516486}
+.pill.amber{background:#fff1d6;color:#7a4e00}
+.pill.red{background:#fdecea;color:#9c2a1c}
+.pill.green{background:#e7f6ec;color:#1f6e42}
+
+.summary-box{white-space:pre-wrap;font-family:Inter;font-size:.9rem;background:#fbfcfe;border:1px solid var(--line);border-radius:11px;padding:16px;line-height:1.6;max-height:480px;overflow:auto}
+.chartbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px 8px;box-shadow:var(--shadow);margin:0 0 16px}
+.chartbox h4{margin:0 0 10px;font-size:.95rem}
+.chart-wrap{position:relative;height:240px}
+
+.steps{counter-reset:s;margin:14px 0}
+.step{display:flex;gap:14px;padding:12px 0;border-bottom:1px dashed var(--line)}
+.step:last-child{border-bottom:none}
+.step .sn{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
+.step .sb h4{margin:0 0 2px;font-size:.98rem}
+.step .sb p{margin:0;font-size:.88rem;color:var(--muted)}
+
+.empty{text-align:center;color:var(--muted);padding:36px 16px;font-size:.92rem}
+.req{color:var(--danger);font-weight:700}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:.9rem;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:90;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{border-top:1px solid var(--line);background:#fff;padding:22px 0;font-size:.82rem;color:var(--muted)}
+footer a{color:var(--navy);font-weight:600}
+.foot-grid{display:flex;gap:22px;flex-wrap:wrap;justify-content:space-between}
+@media print{nav.tabs,header,.btn-row,footer,.no-print{display:none!important}.panel{display:block!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brandrow">
+      <h1>Restraint Log App</h1>
+      <span class="badge">Free resource</span>
+    </div>
+    <p>Record physical interventions clearly, safely and professionally &mdash; built to support Ofsted &amp; CQC-ready incident reporting.</p>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tabs-inner" id="tabs">
+    <button class="tab active" data-tab="log">New log entry</button>
+    <button class="tab" data-tab="entries">Saved logs</button>
+    <button class="tab" data-tab="dashboard">Manager dashboard</button>
+    <button class="tab" data-tab="demo">How it works</button>
+    <button class="tab" data-tab="about">Guidance &amp; privacy</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ============ NEW LOG ENTRY ============ -->
+<section class="panel active" id="panel-log">
+  <div class="notice amber">
+    <strong>This tool supports recording &mdash; it does not replace</strong> your incident report, safeguarding procedures, Regulation 40 / CQC notifications, local authority reporting, medical advice or professional judgement. Physical intervention should only ever be used when <strong>necessary, proportionate, reasonable and the least restrictive option</strong> in response to immediate risk. Only use techniques you have been trained and assessed as competent to use.
+  </div>
+
+  <form id="logForm" novalidate>
+
+  <!-- 1 -->
+  <div class="card" data-card>
+    <div class="card-head"><h3><span class="num">1</span>Incident details</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <div class="grid3">
+        <label class="fld"><span>Date of incident <span class="req">*</span></span><input type="date" name="dateIncident" required></label>
+        <label class="fld"><span>Start time <span class="req">*</span></span><input type="time" name="startTime" required></label>
+        <label class="fld"><span>End time <span class="req">*</span></span><input type="time" name="endTime" required></label>
+      </div>
+      <div class="grid3">
+        <label class="fld"><span>Duration (auto)</span><input type="text" name="durationText" readonly placeholder="—"></label>
+        <label class="fld"><span>Location of incident</span><input type="text" name="location" placeholder="e.g. Lounge, Flat 2"></label>
+        <label class="fld"><span>Age / service type <span class="hint" style="display:inline">if relevant</span></span><input type="text" name="ageService" placeholder="e.g. 15 / children's home"></label>
+      </div>
+      <label class="fld"><span>Name or initials of person supported</span>
+        <input type="text" name="personRef" placeholder="Use initials where possible">
+        <span class="hint">Use initials to protect privacy. Do not enter unnecessary personal information.</span></label>
+      <div class="grid2">
+        <label class="fld"><span>Staff involved</span><input type="text" name="staffInvolved" placeholder="Names or initials"></label>
+        <label class="fld"><span>Witnesses</span><input type="text" name="witnesses" placeholder="Names or initials"></label>
+      </div>
+      <label class="fld"><span>Other professionals involved</span><input type="text" name="otherProfessionals" placeholder="e.g. paramedic, social worker"></label>
+      <div class="grid3" id="ynGrid1"></div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">2</span>Reason for restraint</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <label class="fld"><span>Why was physical intervention used? <span class="req">*</span></span>
+        <select name="reason" required id="reasonSelect"></select></label>
+      <label class="fld"><span>Describe the immediate risk that made physical intervention necessary</span>
+        <textarea name="reasonText" placeholder="What was happening that created an immediate risk of harm?"></textarea></label>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">3</span>De-escalation attempted first</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <p class="hint">Tick everything that was tried <em>before</em> any physical intervention.</p>
+      <div class="checks" id="deescChecks"></div>
+      <label class="fld" style="margin-top:12px"><span>Describe the de-escalation used and why it was not enough to keep everyone safe</span>
+        <textarea name="deescText"></textarea></label>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">4</span>Dynamic risk assessment</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body" id="draBody"></div>
+  </div>
+
+  <!-- 5 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">5</span>Technique used</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <div class="notice navy"><strong>Only select techniques staff have been trained and assessed as competent to use.</strong> All techniques are from the GCM Physical Intervention course. There are no locks or pain-compliance techniques.</div>
+      <h4 style="font-size:.95rem">Breakaway techniques</h4>
+      <div class="checks" id="breakChecks"></div>
+      <h4 style="font-size:.95rem;margin-top:16px">Physical intervention techniques</h4>
+      <div class="checks" id="piChecks"></div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">6</span>Description of the hold / intervention</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <p class="hint">Describe exactly how the intervention was applied. Cover: where staff were positioned; which arm/wrist/body area was supported; whether the person was standing, walking, seated or escorted; whether they were kept upright; whether pressure was avoided on chest, neck, throat, head, abdomen and joints; whether the airway was clear; whether communication was maintained; how the person was monitored; how the intervention was released; how distance was created afterwards.</p>
+      <textarea name="description" style="min-height:150px"></textarea>
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">7</span>Safety checks</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <p class="hint">Tick each statement that is true of this intervention.</p>
+      <div class="checks" id="safetyChecks"></div>
+      <label class="fld" id="safetyExplainWrap" style="margin-top:12px;display:none">
+        <span>Some safety checks are not ticked &mdash; please explain <span class="req">*</span></span>
+        <textarea name="safetyExplain" placeholder="Explain why any box above could not be ticked."></textarea></label>
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">8</span>Time &amp; duration review</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <div class="notice navy">Total duration: <strong id="durEcho">—</strong> (calculated from start and end time in section 1).</div>
+      <div class="grid2">
+        <div><label class="fld"><span>Was the restraint longer than expected?</span><div class="yn" data-yn="longerExpected"></div></label></div>
+        <div><label class="fld"><span>Was the restraint reviewed while it was happening?</span><div class="yn" data-yn="reviewedDuring"></div></label></div>
+      </div>
+      <label class="fld"><span>If longer than expected, explain why</span><textarea name="longerWhy"></textarea></label>
+      <label class="fld"><span>Were there any pauses or changes in hold?</span><textarea name="pausesChanges"></textarea></label>
+    </div>
+  </div>
+
+  <!-- 9 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">9</span>Staff involved</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <div class="grid2">
+        <label class="fld"><span>Lead staff member</span><input type="text" name="leadStaff"></label>
+        <label class="fld"><span>Second staff member</span><input type="text" name="secondStaff"></label>
+        <label class="fld"><span>Third staff member <span class="hint" style="display:inline">if applicable</span></span><input type="text" name="thirdStaff"></label>
+        <label class="fld"><span>Manager on duty</span><input type="text" name="managerOnDuty"></label>
+      </div>
+      <div class="grid3">
+        <label class="fld"><span>Was everyone trained in the technique used?</span><div class="yn" data-yn="allTrained"></div></label>
+        <label class="fld"><span>Was anyone injured?</span><div class="yn" data-yn="anyoneInjured"></div></label>
+        <label class="fld"><span>Were staff debriefed?</span><div class="yn" data-yn="staffDebriefed"></div></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">10</span>Outcome</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <div class="checks" id="outcomeChecks"></div>
+      <label class="fld" style="margin-top:12px"><span>Describe the outcome of the intervention</span><textarea name="outcomeText"></textarea></label>
+    </div>
+  </div>
+
+  <!-- 11 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">11</span>Aftercare &amp; debrief</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body" id="aftercareBody"></div>
+  </div>
+
+  <!-- 13 -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">12</span>Manager review</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <p class="hint">Completed by the manager reviewing this incident.</p>
+      <div class="grid2">
+        <label class="fld"><span>Manager name</span><input type="text" name="mgrName"></label>
+        <label class="fld"><span>Date reviewed</span><input type="date" name="mgrDate"></label>
+      </div>
+      <div id="mgrQuestions"></div>
+      <label class="fld" style="margin-top:6px"><span>Manager decision</span></label>
+      <div class="checks" id="mgrDecision"></div>
+      <label class="fld" style="margin-top:12px"><span>Lessons learned</span><textarea name="mgrLessons"></textarea></label>
+    </div>
+  </div>
+
+  <div class="btn-row no-print" style="margin-top:18px">
+    <button type="button" class="btn btn-primary" id="saveBtn">Save log entry</button>
+    <button type="button" class="btn btn-navy" id="genBtn">Generate incident report summary</button>
+    <button type="button" class="btn btn-ghost" id="clearBtn">Clear form</button>
+  </div>
+  <input type="hidden" name="editingId" value="">
+  </form>
+
+  <!-- Generated summary -->
+  <div class="card" id="summaryCard" style="display:none">
+    <div class="card-head" style="cursor:default"><h3><span class="num" style="background:var(--amber);color:#3a2600">&#9776;</span>Incident report summary</h3></div>
+    <div class="card-body">
+      <div class="notice navy">Copy this into your organisation&rsquo;s incident report. It is a structured starting point, not the full report.</div>
+      <div class="summary-box" id="summaryText"></div>
+      <div class="btn-row no-print" style="margin-top:14px">
+        <button type="button" class="btn btn-ghost" id="copyBtn">Copy summary</button>
+        <button type="button" class="btn btn-navy" id="pdfBtn">Download PDF</button>
+        <button type="button" class="btn btn-ghost" id="emailBtn">Email to manager</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SAVED LOGS ============ -->
+<section class="panel" id="panel-entries">
+  <h2>Saved logs</h2>
+  <p class="hint">Saved on this device only, in this browser. Clearing browser data will remove them. Follow your organisation&rsquo;s data-protection policy.</p>
+  <div id="entriesList"></div>
+</section>
+
+<!-- ============ DASHBOARD ============ -->
+<section class="panel" id="panel-dashboard">
+  <h2>Manager dashboard</h2>
+  <p class="hint">An at-a-glance view of recorded incidents to support quality assurance, supervision and learning.</p>
+  <div id="dashStats" class="stat-grid"></div>
+  <div id="dashCharts"></div>
+  <div id="dashEmpty" class="empty" style="display:none">No saved logs yet. Once you save entries, trends and charts appear here.</div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="panel" id="panel-demo">
+  <h2>See how the Restraint Log App works</h2>
+  <div class="notice navy">A worked example so you can see what the app produces &mdash; before you use it for real.</div>
+  <div class="card"><div class="card-body">
+    <h3>Demo scenario</h3>
+    <p>A young person becomes distressed following a boundary around leaving the home late at night. Staff use verbal reassurance, offer space, reduce the audience, offer choices and attempt distraction. The young person attempts to strike another young person and moves towards the front door. Staff complete a dynamic risk assessment and use a trained low-level touch support and escort to move the young person to a safer area. The intervention lasts 45 seconds and is released as soon as the risk reduces. The young person is offered emotional support afterwards, and the manager reviews the incident.</p>
+    <div class="steps">
+      <div class="step"><div class="sn">1</div><div class="sb"><h4>Add incident details</h4><p>Date, start &amp; end time (duration auto-calculates), location, who was involved.</p></div></div>
+      <div class="step"><div class="sn">2</div><div class="sb"><h4>Select reason for restraint</h4><p>Immediate risk of harm to others &mdash; with a short description of the risk.</p></div></div>
+      <div class="step"><div class="sn">3</div><div class="sb"><h4>Record de-escalation attempted</h4><p>Verbal reassurance, giving space, removing audience, offering choices, distraction.</p></div></div>
+      <div class="step"><div class="sn">4</div><div class="sb"><h4>Select technique used</h4><p>Touch support &amp; escorting (low level) &mdash; a trained, least-restrictive option.</p></div></div>
+      <div class="step"><div class="sn">5</div><div class="sb"><h4>Describe the hold</h4><p>Position, body area supported, upright throughout, airway clear, how it was released.</p></div></div>
+      <div class="step"><div class="sn">6</div><div class="sb"><h4>Complete safety checks</h4><p>No neck pressure, no pain compliance, no locks, breathing monitored, dignity maintained.</p></div></div>
+      <div class="step"><div class="sn">7</div><div class="sb"><h4>Add outcome &amp; aftercare</h4><p>Person escorted to a safer area, emotional support offered, checked for injury.</p></div></div>
+      <div class="step"><div class="sn">8</div><div class="sb"><h4>Generate incident report summary</h4><p>The app builds a clear summary to copy into your incident report.</p></div></div>
+      <div class="step"><div class="sn">9</div><div class="sb"><h4>Manager review</h4><p>Necessary? Proportionate? Least restrictive? In line with training and policy?</p></div></div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" id="loadDemoBtn">Load this example into the form</button>
+    </div>
+  </div></div>
+  <div class="card"><div class="card-body">
+    <h3>Sample generated summary</h3>
+    <div class="summary-box" id="demoSummary"></div>
+  </div></div>
+</section>
+
+<!-- ============ GUIDANCE & PRIVACY ============ -->
+<section class="panel" id="panel-about">
+  <h2>Guidance &amp; privacy</h2>
+  <div class="card"><div class="card-body">
+    <h3>What this tool is for</h3>
+    <p>This tool supports professional recording. It does <strong>not</strong> replace organisational policy, safeguarding procedures, Regulation 40 notifications, CQC notifications, incident reporting systems, local authority reporting requirements, medical advice or professional judgement.</p>
+    <p>Physical intervention should only be used when <strong>necessary, proportionate, reasonable and the least restrictive option</strong> available in response to immediate risk. Staff should only use techniques they have been trained and assessed as competent to use.</p>
+  </div></div>
+  <div class="card"><div class="card-body">
+    <h3>Data &amp; privacy</h3>
+    <ul>
+      <li>Do not enter unnecessary personal information.</li>
+      <li>Use initials where appropriate.</li>
+      <li>Follow your organisation&rsquo;s data-protection policy.</li>
+      <li>Only authorised staff should access restraint records.</li>
+      <li>Records must be stored securely.</li>
+      <li>Exported PDFs must be handled confidentially.</li>
+    </ul>
+    <p class="hint">Entries you save are stored only in this browser on this device. Nothing is sent to a server.</p>
+  </div></div>
+  <div class="card"><div class="card-body">
+    <h3>Linked to Therapeutic Physical Intervention Training</h3>
+    <p>This Restraint Log App is provided as a free resource for learners completing our Therapeutic Physical Intervention Training. It helps staff move from training-room learning into safer, clearer and more professional workplace recording.</p>
+  </div></div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>Therapeutic Physical Intervention Training<br><span style="color:#90a0bd">Techniques aligned to GCM Physical Intervention course content.</span></div>
+    <div>Info: 020 4618 0163 &nbsp;&middot;&nbsp; Booking: +44 7481 810622</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   CONFIG — all dropdown / checklist options live here.
+   Edit these arrays to change options later.
+   ========================================================= */
+var CONFIG = {
+  reasons: [
+    "Immediate risk of harm to self",
+    "Immediate risk of harm to others",
+    "Risk of serious property damage leading to harm",
+    "Attempting to abscond into unsafe environment",
+    "Physical assault or attempted assault",
+    "Weapon or dangerous object involved",
+    "Serious escalation after de-escalation failed",
+    "Preventing injury during crisis",
+    "Other"
+  ],
+  deescalation: [
+    "Verbal reassurance","Calm tone of voice","Active listening","Giving space",
+    "Reducing demands","Offering choices","Changing staff member","Removing audience",
+    "Reducing noise or stimulation","Distraction","Time out / cooling-off period",
+    "Offering preferred activity","Use of known behaviour support plan",
+    "PACE / therapeutic communication","Beacon-style relational approach",
+    "Dynamic risk assessment","Environmental change","Manager support requested","Other"
+  ],
+  dra: [
+    ["immediateRisk","What was the immediate risk?"],
+    ["whoAtRisk","Who was at risk?"],
+    ["ifNotAct","What could happen if staff did not act?"],
+    ["alternatives","What alternatives were considered?"],
+    ["whyNecessary","Why was physical intervention judged necessary?"],
+    ["leastRestrictive","Was this the least restrictive option available? Explain."],
+    ["proportionate","Was the intervention proportionate to the risk? Explain."],
+    ["envSafe","Was the environment safe enough for intervention?"],
+    ["enoughStaff","Were there enough trained staff?"],
+    ["healthConsidered","Was the person's physical health considered?"],
+    ["knownRisks","Known risks considered (asthma, epilepsy, trauma history, injury, pregnancy, disability, communication needs, emotional distress)?"]
+  ],
+  breakaway: [
+    "One hand wrist grab","Two handed wrist grab","Clothing grab technique 1",
+    "Clothing grab technique 2","Clothing grab technique 3 (absolute last resort)",
+    "Two shoulder grab","One hand strangulation breakaway","Two handed strangulation breakaway",
+    "Bear hug breakaway","Hair grab front","Hair grab rear / reverse",
+    "Hand bite release","Chest bite release"
+  ],
+  pi: [
+    "Touch support & escorting — low level, one staff member",
+    "Touch support & escorting — low level, two staff members",
+    "Cup fist — low level, two staff members",
+    "Straight arm — low level, two staff members",
+    "Standing to seated — three seats available",
+    "Standing to seated — two seats available",
+    "Standing to seated — one seat available",
+    "Double wrist hold",
+    "Other trained technique"
+  ],
+  safety: [
+    "No pressure was applied to the neck or throat.",
+    "No pain compliance was used.",
+    "No locks were used.",
+    "The person was kept upright where possible.",
+    "Breathing was monitored.",
+    "The person's dignity was maintained.",
+    "The intervention ended as soon as it was safe.",
+    "The least restrictive option was used.",
+    "Staff used only trained techniques.",
+    "Staff attempted de-escalation before physical intervention where possible.",
+    "A manager was informed.",
+    "Post-incident support was offered.",
+    "The incident was recorded in line with policy."
+  ],
+  outcomes: [
+    "Person calmed","Person escorted to safer area","Person seated safely",
+    "Person released and given space","Medical support required","Manager attended",
+    "Police attended","Social worker informed","Parent / carer informed",
+    "Safeguarding referral considered","Regulation notification considered",
+    "Incident report completed","Behaviour support plan updated","Risk assessment updated",
+    "Placement stability review required","Other"
+  ],
+  aftercare: [
+    ["checkedInjury","Was the person checked for injury?"],
+    ["emotionalSupport","Was emotional support offered?"],
+    ["timeSpace","Was the person given time and space to recover?"],
+    ["restorative","Was a restorative conversation offered when appropriate?"],
+    ["askedViews","Was the person asked for their views?"],
+    ["advocate","Was an advocate, parent, social worker or trusted adult needed?"],
+    ["staffDebrief","Were staff debriefed?"],
+    ["mgrInformed","Was the manager informed?"],
+    ["reviewLearning","Was the incident reviewed for learning?"],
+    ["planUpdate","Does the care plan or risk assessment need updating?"]
+  ],
+  yesNo1: [
+    ["managerInformed","Manager informed"],["police","Police involved"],
+    ["medical","Medical attention required"],["injury","Injury reported"],
+    ["safeguarding","Safeguarding concern"],["regNotification","Regulation notification required"],
+    ["parentInformed","Parent / carer / social worker informed"]
+  ],
+  mgrQuestions: [
+    ["necessary","Was the restraint necessary?"],
+    ["proportionate","Was it proportionate?"],
+    ["leastRestrictive","Was it the least restrictive option?"],
+    ["inLineTraining","Was it in line with training?"],
+    ["inLinePolicy","Was it in line with policy?"],
+    ["recordingClear","Was the recording clear enough?"],
+    ["notificationsDone","Were notifications completed?"],
+    ["planUpdate","Does the person's plan need updating?"],
+    ["practiceFollowup","Does staff practice require follow-up?"],
+    ["supervision","Is supervision required?"],
+    ["training","Is training required?"],
+    ["safeguardingFollowup","Is safeguarding follow-up required?"]
+  ],
+  mgrDecision: [
+    "No further action","Update risk assessment","Update behaviour support plan",
+    "Staff supervision required","Training refresher required","Safeguarding referral required",
+    "Regulation notification required","Internal investigation required","External advice required","Other"
+  ]
+};
+
+var STORE_KEY = "rla_entries_v1";
+
+/* ---------- tiny helpers ---------- */
+function el(tag,attrs,html){var e=document.createElement(tag);if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);if(html!=null)e.innerHTML=html;return e;}
+function $(s,r){return (r||document).querySelector(s);}
+function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
+function load(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||[];}catch(e){return [];}}
+function save(arr){localStorage.setItem(STORE_KEY,JSON.stringify(arr));}
+function uid(){return "e"+Date.now()+Math.floor(Math.random()*1000);}
+
+/* ---------- yes/no control ---------- */
+function ynControl(name){
+  var wrap=el("div",{"class":"yn","data-yn":name});
+  ["Yes","No"].forEach(function(v){
+    var lab=el("label");
+    lab.innerHTML='<input type="radio" name="'+name+'" value="'+v+'"><span>'+v+'</span>';
+    wrap.appendChild(lab);
+  });
+  return wrap;
+}
+
+/* =========================================================
+   BUILD THE FORM
+   ========================================================= */
+function buildForm(){
+  // 1 yes/no grid
+  var g1=$("#ynGrid1");
+  CONFIG.yesNo1.forEach(function(p){
+    var w=el("label",{"class":"fld"}); w.appendChild(el("span",null,p[1]));
+    w.appendChild(ynControl(p[0])); g1.appendChild(w);
+  });
+  // 2 reason select
+  var sel=$("#reasonSelect"); sel.appendChild(el("option",{value:""},"— Select a reason —"));
+  CONFIG.reasons.forEach(function(r){sel.appendChild(el("option",{value:r},esc(r)));});
+  // 3 deescalation
+  buildChecks("#deescChecks","de_",CONFIG.deescalation);
+  // 4 dra
+  var dra=$("#draBody");
+  CONFIG.dra.forEach(function(q){
+    var w=el("label",{"class":"fld"}); w.appendChild(el("span",null,esc(q[1])));
+    w.appendChild(el("textarea",{name:"dra_"+q[0]})); dra.appendChild(w);
+  });
+  // 5 techniques
+  buildChecks("#breakChecks","bk_",CONFIG.breakaway);
+  buildChecks("#piChecks","pi_",CONFIG.pi);
+  // 7 safety
+  buildChecks("#safetyChecks","sf_",CONFIG.safety,true);
+  // 8 yn
+  fillYn("longerExpected"); fillYn("reviewedDuring");
+  // 9 yn
+  fillYn("allTrained"); fillYn("anyoneInjured"); fillYn("staffDebriefed");
+  // 10 outcomes
+  buildChecks("#outcomeChecks","oc_",CONFIG.outcomes);
+  // 11 aftercare
+  var ac=$("#aftercareBody");
+  CONFIG.aftercare.forEach(function(q){
+    var w=el("label",{"class":"fld"}); w.appendChild(el("span",null,esc(q[1])));
+    w.appendChild(ynControl("ac_"+q[0])); ac.appendChild(w);
+  });
+  // 12 manager questions
+  var mq=$("#mgrQuestions");
+  CONFIG.mgrQuestions.forEach(function(q){
+    var w=el("label",{"class":"fld"}); w.appendChild(el("span",null,esc(q[1])));
+    w.appendChild(ynControl("mq_"+q[0])); mq.appendChild(w);
+  });
+  buildChecks("#mgrDecision","md_",CONFIG.mgrDecision);
+}
+function buildChecks(sel,prefix,items,isSafety){
+  var c=$(sel);
+  items.forEach(function(it,i){
+    var lab=el("label",{"class":"chk"+(isSafety?" safety":"")});
+    lab.innerHTML='<input type="checkbox" name="'+prefix+i+'" value="'+esc(it)+'"><span>'+esc(it)+'</span>';
+    c.appendChild(lab);
+  });
+}
+function fillYn(name){ $('[data-yn="'+name+'"]').replaceWith(ynControl(name)); }
+
+/* =========================================================
+   COLLAPSE / EXPAND CARDS + TABS
+   ========================================================= */
+function wireUI(){
+  $all("[data-card] .card-head").forEach(function(h){
+    h.addEventListener("click",function(){h.parentElement.classList.toggle("collapsed");});
+  });
+  $all(".tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      $all(".tab").forEach(function(x){x.classList.remove("active");});
+      $all(".panel").forEach(function(p){p.classList.remove("active");});
+      t.classList.add("active");
+      $("#panel-"+t.dataset.tab).classList.add("active");
+      if(t.dataset.tab==="entries") renderEntries();
+      if(t.dataset.tab==="dashboard") renderDashboard();
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
+  });
+  // duration
+  ["startTime","endTime","dateIncident"].forEach(function(n){
+    var f=$('[name="'+n+'"]'); if(f) f.addEventListener("input",updateDuration);
+  });
+  // safety explain reveal
+  $("#safetyChecks").addEventListener("change",checkSafety);
+}
+
+function updateDuration(){
+  var s=$('[name="startTime"]').value, e=$('[name="endTime"]').value;
+  var out="—";
+  if(s&&e){
+    var a=s.split(":"),b=e.split(":");
+    var mins=(parseInt(b[0],10)*60+parseInt(b[1],10))-(parseInt(a[0],10)*60+parseInt(a[1],10));
+    if(mins<0) mins+=1440; // crossed midnight
+    var h=Math.floor(mins/60), m=mins%60;
+    out=(h>0?h+" hr ":"")+m+" min ("+mins+" min total)";
+    $('[name="durationText"]').dataset.mins=mins;
+  }
+  $('[name="durationText"]').value=out;
+  $("#durEcho").textContent=out;
+}
+function checkSafety(){
+  var boxes=$all('#safetyChecks input'), unticked=boxes.some(function(b){return !b.checked;});
+  $("#safetyExplainWrap").style.display = unticked? "block":"none";
+}
+
+/* =========================================================
+   COLLECT / FILL FORM <-> ENTRY OBJECT
+   ========================================================= */
+function collect(){
+  var f=$("#logForm"), o={};
+  $all("input,select,textarea",f).forEach(function(inp){
+    if(inp.type==="checkbox"){ if(inp.checked) (o[inp.name]=inp.value); }
+    else if(inp.type==="radio"){ if(inp.checked) o[inp.name]=inp.value; }
+    else if(inp.value!=="") o[inp.name]=inp.value;
+  });
+  o.durationMins = parseInt($('[name="durationText"]').dataset.mins||"0",10)||0;
+  return o;
+}
+function gather(prefix){ // collect checked checklist values into array
+  return $all('#logForm input[name^="'+prefix+'"]:checked').map(function(b){return b.value;});
+}
+function fillForm(o){
+  clearForm();
+  $all("#logForm input,#logForm select,#logForm textarea").forEach(function(inp){
+    if(o[inp.name]==null) return;
+    if(inp.type==="checkbox"){ inp.checked = (o[inp.name]===inp.value); }
+    else if(inp.type==="radio"){ inp.checked = (o[inp.name]===inp.value); }
+    else inp.value=o[inp.name];
+  });
+  updateDuration(); checkSafety();
+}
+function clearForm(){
+  $("#logForm").reset();
+  $('[name="editingId"]').value="";
+  $('[name="durationText"]').dataset.mins="";
+  updateDuration(); checkSafety();
+  $("#summaryCard").style.display="none";
+}
+
+/* =========================================================
+   SUMMARY GENERATION
+   ========================================================= */
+function summaryFor(o){
+  var L=[];
+  var date=o.dateIncident||"[date]", st=o.startTime||"[start]", et=o.endTime||"[end]";
+  var dur=o.durationText||"[duration]";
+  var person=o.personRef||"the person supported";
+  var deesc=gatherFrom(o,"de_");
+  var risk=o.reason||"[immediate risk]";
+  var tech=gatherFrom(o,"bk_").concat(gatherFrom(o,"pi_"));
+  var outc=gatherFrom(o,"oc_");
+  var safetyTicked=gatherFrom(o,"sf_");
+
+  L.push("INCIDENT REPORT SUMMARY");
+  L.push("Generated by the Restraint Log App — supports, does not replace, your incident report.");
+  L.push("");
+  L.push("Date & time: "+date+", "+st+"–"+et+"  (duration: "+dur+")");
+  if(o.location) L.push("Location: "+o.location);
+  if(o.personRef) L.push("Person supported: "+person);
+  if(o.ageService) L.push("Age / service type: "+o.ageService);
+  if(o.staffInvolved) L.push("Staff involved: "+o.staffInvolved);
+  if(o.witnesses) L.push("Witnesses: "+o.witnesses);
+  if(o.otherProfessionals) L.push("Other professionals: "+o.otherProfessionals);
+  L.push("");
+  L.push("WHAT HAPPENED / IMMEDIATE RISK");
+  L.push("The immediate risk identified was: "+risk+".");
+  if(o.reasonText) L.push(o.reasonText);
+  L.push("");
+  L.push("DE-ESCALATION ATTEMPTED FIRST");
+  L.push(deesc.length? "Staff attempted: "+deesc.join(", ")+"." : "No de-escalation recorded.");
+  if(o.deescText) L.push(o.deescText);
+  L.push("These strategies did not reduce the immediate risk to a safe level.");
+  L.push("");
+  L.push("DYNAMIC RISK ASSESSMENT");
+  CONFIG.dra.forEach(function(q){ if(o["dra_"+q[0]]) L.push("• "+q[1]+" "+o["dra_"+q[0]]); });
+  L.push("");
+  L.push("TECHNIQUE USED");
+  L.push(tech.length? tech.join("; ") : "[technique]");
+  if(o.description){ L.push(""); L.push("DESCRIPTION OF THE HOLD"); L.push(o.description); }
+  L.push("");
+  L.push("DURATION");
+  L.push("The intervention began at "+st+" and ended at "+et+", lasting "+dur+".");
+  if(o.longerExpected==="Yes"&&o.longerWhy) L.push("Longer than expected because: "+o.longerWhy);
+  if(o.pausesChanges) L.push("Pauses / changes in hold: "+o.pausesChanges);
+  L.push("");
+  L.push("MONITORING & SAFETY CHECKS");
+  L.push("Staff confirm: "+(safetyTicked.length?safetyTicked.join(" "):"[safety checks]"));
+  if(o.safetyExplain) L.push("Note on safety checks: "+o.safetyExplain);
+  L.push("");
+  L.push("OUTCOME");
+  L.push(outc.length? outc.join(", ")+"." : "[outcome]");
+  if(o.outcomeText) L.push(o.outcomeText);
+  L.push("");
+  L.push("AFTERCARE");
+  var acLines=[];
+  CONFIG.aftercare.forEach(function(q){ if(o["ac_"+q[0]]) acLines.push(q[1]+" "+o["ac_"+q[0]]); });
+  L.push(acLines.length? acLines.join("  ") : "Aftercare to be confirmed.");
+  L.push("");
+  L.push("NOTIFICATIONS");
+  var notif=[];
+  [["police","Police"],["medical","Medical attention"],["injury","Injury reported"],
+   ["safeguarding","Safeguarding concern"],["regNotification","Regulation notification"],
+   ["parentInformed","Parent/carer/social worker informed"],["managerInformed","Manager informed"]]
+   .forEach(function(p){ if(o[p[0]]) notif.push(p[1]+": "+o[p[0]]); });
+  L.push(notif.length? notif.join("  •  ") : "None recorded.");
+  L.push("");
+  L.push("MANAGER REVIEW & LEARNING");
+  if(o.mgrName) L.push("Reviewed by "+o.mgrName+(o.mgrDate?" on "+o.mgrDate:"")+".");
+  var mgrFlags=[];
+  CONFIG.mgrQuestions.forEach(function(q){ if(o["mq_"+q[0]]) mgrFlags.push(q[1]+" "+o["mq_"+q[0]]); });
+  if(mgrFlags.length) L.push(mgrFlags.join("  "));
+  var dec=gatherFrom(o,"md_"); if(dec.length) L.push("Decision: "+dec.join(", ")+".");
+  if(o.mgrLessons) L.push("Lessons learned: "+o.mgrLessons);
+  L.push("");
+  L.push("ACTIONS REQUIRED");
+  L.push(dec.length? dec.join(", ") : "To be confirmed by the manager.");
+  L.push("");
+  L.push("— Physical intervention was used only as a last resort, when necessary, proportionate and the least restrictive option. Staff used only techniques they are trained and assessed as competent to use. —");
+  return L.join("\n");
+}
+function gatherFrom(o,prefix){
+  var out=[]; for(var k in o){ if(k.indexOf(prefix)===0) out.push(o[k]); } return out;
+}
+
+/* =========================================================
+   ACTIONS: save / generate / copy / pdf / email
+   ========================================================= */
+function doSave(){
+  var o=collect();
+  if(!o.dateIncident||!o.startTime||!o.endTime){ toast("Add date, start and end time first."); return; }
+  var arr=load(), id=$('[name="editingId"]').value;
+  if(id){ for(var i=0;i<arr.length;i++){ if(arr[i].id===id){ o.id=id; o.createdAt=arr[i].createdAt; arr[i]=o; break; } } }
+  else { o.id=uid(); o.createdAt=new Date().toISOString(); arr.unshift(o); $('[name="editingId"]').value=o.id; }
+  save(arr); toast("Log saved on this device.");
+}
+function doGenerate(){
+  var o=collect();
+  var txt=summaryFor(o);
+  $("#summaryText").textContent=txt;
+  $("#summaryCard").style.display="block";
+  $("#summaryCard").scrollIntoView({behavior:"smooth"});
+}
+function doCopy(){
+  var txt=$("#summaryText").textContent;
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){toast("Summary copied.");},fallbackCopy.bind(null,txt)); }
+  else fallbackCopy(txt);
+}
+function fallbackCopy(txt){
+  var ta=el("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select();
+  try{document.execCommand("copy");toast("Summary copied.");}catch(e){toast("Press and hold to copy.");}
+  document.body.removeChild(ta);
+}
+function doPDF(){
+  var txt=$("#summaryText").textContent;
+  if(!window.jspdf){ toast("PDF library still loading — try again."); return; }
+  var doc=new window.jspdf.jsPDF({unit:"pt",format:"a4"});
+  var margin=46, width=515, y=54;
+  doc.setFont("helvetica","bold"); doc.setFontSize(14);
+  doc.text("Restraint Log — Incident Report Summary",margin,y); y+=22;
+  doc.setFont("helvetica","normal"); doc.setFontSize(10);
+  var lines=doc.splitTextToSize(txt,width);
+  lines.forEach(function(ln){
+    if(y>790){ doc.addPage(); y=54; }
+    doc.text(ln,margin,y); y+=14;
+  });
+  doc.save("restraint-log-summary.pdf");
+  toast("PDF downloaded.");
+}
+function doEmail(){
+  var txt=$("#summaryText").textContent;
+  var subject=encodeURIComponent("Restraint log — incident report summary");
+  var body=encodeURIComponent(txt.slice(0,1800));
+  window.location.href="mailto:?subject="+subject+"&body="+body;
+}
+
+/* =========================================================
+   SAVED ENTRIES LIST
+   ========================================================= */
+function renderEntries(){
+  var arr=load(), c=$("#entriesList");
+  if(!arr.length){ c.innerHTML='<div class="empty">No saved logs yet. Complete the form and tap <strong>Save log entry</strong>.</div>'; return; }
+  c.innerHTML="";
+  arr.forEach(function(o){
+    var pills="";
+    if(o.injury==="Yes") pills+='<span class="pill red">Injury</span>';
+    if(o.safeguarding==="Yes") pills+='<span class="pill red">Safeguarding</span>';
+    if(o.police==="Yes") pills+='<span class="pill amber">Police</span>';
+    if(o.regNotification==="Yes") pills+='<span class="pill amber">Reg notification</span>';
+    pills+= o.mgrName? '<span class="pill green">Reviewed</span>':'<span class="pill grey">Review open</span>';
+    var d=el("div",{"class":"entry"});
+    d.innerHTML='<div class="entry-top"><div>'+
+      '<h4>'+esc(o.personRef||"Person supported")+' &middot; '+esc(o.dateIncident||"")+'</h4>'+
+      '<div class="meta">'+esc(o.reason||"Reason not set")+' &middot; '+esc(o.durationText||"")+(o.location?" &middot; "+esc(o.location):"")+'</div>'+
+      '<div>'+pills+'</div></div></div>'+
+      '<div class="btn-row" style="margin-top:10px">'+
+        '<button class="btn btn-ghost" data-act="edit" data-id="'+o.id+'">Open / edit</button>'+
+        '<button class="btn btn-navy" data-act="sum" data-id="'+o.id+'">Summary</button>'+
+        '<button class="btn btn-danger" data-act="del" data-id="'+o.id+'">Delete</button>'+
+      '</div>';
+    c.appendChild(d);
+  });
+  $all('[data-act]',c).forEach(function(b){
+    b.addEventListener("click",function(){
+      var id=b.dataset.id, arr=load(), o=arr.filter(function(x){return x.id===id;})[0];
+      if(!o) return;
+      if(b.dataset.act==="edit"){ goTab("log"); fillForm(o); $('[name="editingId"]').value=o.id; toast("Loaded into form."); }
+      if(b.dataset.act==="sum"){ goTab("log"); fillForm(o); $('[name="editingId"]').value=o.id; doGenerate(); }
+      if(b.dataset.act==="del"){ if(confirm("Delete this log permanently from this device?")){ save(arr.filter(function(x){return x.id!==id;})); renderEntries(); toast("Log deleted."); } }
+    });
+  });
+}
+function goTab(name){ $('.tab[data-tab="'+name+'"]').click(); }
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+var charts=[];
+function renderDashboard(){
+  var arr=load();
+  var sg=$("#dashStats"), cc=$("#dashCharts");
+  charts.forEach(function(c){c.destroy();}); charts=[];
+  if(!arr.length){ sg.innerHTML=""; cc.innerHTML=""; $("#dashEmpty").style.display="block"; return; }
+  $("#dashEmpty").style.display="none";
+
+  var now=new Date(), wk=0,mo=0,durs=[],byPerson={},byLoc={},byHour={},byReason={},byDe={},byTech={},byStaff={};
+  var injuries=0,police=0,medical=0,safeg=0,reg=0,reviewed=0,open=0;
+  arr.forEach(function(o){
+    var d=o.dateIncident? new Date(o.dateIncident):null;
+    if(d){ var diff=(now-d)/86400000; if(diff<=7)wk++; if(diff<=31)mo++; }
+    if(o.durationMins) durs.push(o.durationMins);
+    inc(byPerson,o.personRef||"Unknown"); inc(byLoc,o.location||"Not set");
+    if(o.startTime) inc(byHour,o.startTime.split(":")[0]+":00");
+    if(o.reason) inc(byReason,o.reason);
+    gatherFrom(o,"de_").forEach(function(v){inc(byDe,v);});
+    gatherFrom(o,"bk_").concat(gatherFrom(o,"pi_")).forEach(function(v){inc(byTech,v);});
+    [o.staffInvolved,o.leadStaff].forEach(function(s){ if(s) s.split(/[,/]/).forEach(function(x){x=x.trim(); if(x) inc(byStaff,x);}); });
+    if(o.injury==="Yes")injuries++; if(o.police==="Yes")police++; if(o.medical==="Yes")medical++;
+    if(o.safeguarding==="Yes")safeg++; if(o.regNotification==="Yes")reg++;
+    if(o.mgrName)reviewed++; else open++;
+  });
+  var avg=durs.length? Math.round(durs.reduce(function(a,b){return a+b;},0)/durs.length):0;
+  var longest=durs.length? Math.max.apply(null,durs):0;
+  var repeats=Object.keys(byPerson).filter(function(k){return byPerson[k]>1;}).length;
+
+  var stats=[
+    [arr.length,"Total logs"],[wk,"This week"],[mo,"This month"],
+    [avg+" min","Average duration"],[longest+" min","Longest duration"],[repeats,"Repeat individuals"],
+    [injuries,"Injury incidents",true],[police,"Police involvement",true],[medical,"Medical attention",true],
+    [safeg,"Safeguarding flags",true],[reg,"Reg notification flags",true],
+    [open,"Open reviews"],[reviewed,"Completed reviews"]
+  ];
+  sg.innerHTML="";
+  stats.forEach(function(s){
+    var d=el("div",{"class":"stat"+(s[2]&&s[0]?" flag":"")});
+    d.innerHTML='<div class="n">'+esc(s[0])+'</div><div class="l">'+esc(s[1])+'</div>';
+    sg.appendChild(d);
+  });
+
+  cc.innerHTML="";
+  chartBlock(cc,"Restraints over time",timeSeries(arr),"line");
+  chartBlock(cc,"By reason / trigger",topPairs(byReason),"bar");
+  chartBlock(cc,"By technique used",topPairs(byTech),"bar");
+  chartBlock(cc,"By person",topPairs(byPerson),"bar");
+  chartBlock(cc,"By time of day",hourSeries(byHour),"bar");
+  chartBlock(cc,"Most-used de-escalation",topPairs(byDe),"bar");
+}
+function inc(o,k){o[k]=(o[k]||0)+1;}
+function topPairs(o){ return Object.keys(o).map(function(k){return [k,o[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,8); }
+function timeSeries(arr){
+  var by={}; arr.forEach(function(o){ if(o.dateIncident) inc(by,o.dateIncident); });
+  return Object.keys(by).sort().map(function(k){return [k,by[k]];});
+}
+function hourSeries(o){ return Object.keys(o).sort().map(function(k){return [k,o[k]];}); }
+function chartBlock(parent,title,pairs,type){
+  var box=el("div",{"class":"chartbox"}); box.appendChild(el("h4",null,esc(title)));
+  if(!pairs.length){ box.appendChild(el("p",{"class":"hint"},"No data yet.")); parent.appendChild(box); return; }
+  var wrap=el("div",{"class":"chart-wrap"}); var cv=el("canvas"); wrap.appendChild(cv); box.appendChild(wrap); parent.appendChild(box);
+  var labels=pairs.map(function(p){return p[0];}), data=pairs.map(function(p){return p[1];});
+  var col="#1c3d72", colA="rgba(28,61,114,.12)";
+  var ch=new Chart(cv,{type:type,data:{labels:labels,datasets:[{label:title,data:data,
+    backgroundColor:type==="line"?colA:"#2e5596",borderColor:col,borderWidth:type==="line"?2:0,
+    fill:type==="line",tension:.3,borderRadius:6,maxBarThickness:42}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{ticks:{autoSkip:true,maxRotation:0,font:{size:10}}}}}});
+  charts.push(ch);
+}
+
+/* =========================================================
+   DEMO
+   ========================================================= */
+var DEMO={
+  dateIncident:new Date().toISOString().slice(0,10), startTime:"21:15", endTime:"21:16",
+  durationText:"1 min (1 min total)", durationMins:1,
+  location:"Hallway / front door", personRef:"J.M.", ageService:"15 / children's home",
+  staffInvolved:"K. Adeyemi, L. Pryce", witnesses:"L. Pryce",
+  managerInformed:"Yes", police:"No", medical:"No", injury:"No", safeguarding:"No", regNotification:"No", parentInformed:"No",
+  reason:"Immediate risk of harm to others",
+  reasonText:"After a boundary about leaving the home late at night, the young person attempted to strike a peer and moved towards the front door.",
+  de_0:"Verbal reassurance", de_3:"Giving space", de_5:"Offering choices", de_7:"Removing audience", de_9:"Distraction",
+  deescText:"Staff stayed calm, offered choices and removed the audience. The young person continued to escalate and moved to strike a peer, so the risk could not be reduced by these means alone.",
+  dra_immediateRisk:"Risk of assault to a peer and of absconding into an unsafe environment at night.",
+  dra_whoAtRisk:"Another young person and the young person themselves.",
+  dra_ifNotAct:"A peer could have been assaulted and the young person could have left into traffic in the dark.",
+  dra_whyNecessary:"All de-escalation had been tried and an immediate physical risk remained.",
+  dra_leastRestrictive:"Yes — a low-level touch support and escort, the least restrictive trained option.",
+  dra_proportionate:"Yes — brief, low-level guiding hold matched to the immediate risk.",
+  pi_0:"Touch support & escorting — low level, one staff member",
+  description:"Staff stepped to the young person's side, supported the elbow and guided them away from the door to a calmer area. The young person was upright and walking throughout, the airway was clear, no pressure was placed on the neck, chest or joints, and staff kept talking calmly. The hold was released as soon as the young person was at a safe distance from the door and the peer.",
+  longerExpected:"No", reviewedDuring:"Yes",
+  leadStaff:"K. Adeyemi", secondStaff:"L. Pryce", managerOnDuty:"S. Okafor",
+  allTrained:"Yes", anyoneInjured:"No", staffDebriefed:"Yes",
+  oc_1:"Person escorted to safer area", oc_3:"Person released and given space",
+  outcomeText:"The young person calmed within a few minutes and accepted a drink and a chat.",
+  ac_checkedInjury:"Yes", ac_emotionalSupport:"Yes", ac_timeSpace:"Yes", ac_restorative:"Yes", ac_mgrInformed:"Yes", ac_reviewLearning:"Yes",
+  mgrName:"S. Okafor", mgrDate:new Date().toISOString().slice(0,10),
+  mq_necessary:"Yes", mq_proportionate:"Yes", mq_leastRestrictive:"Yes", mq_inLineTraining:"Yes", mq_inLinePolicy:"Yes", mq_recordingClear:"Yes",
+  md_3:"Staff supervision required", md_2:"Update behaviour support plan",
+  mgrLessons:"Earlier offer of a walk outside with a staff member may reduce night-time escalation. Add to the behaviour support plan."
+};
+// build sf_ safety ticks for demo (all true)
+(function(){ for(var i=0;i<CONFIG.safety.length;i++){ DEMO["sf_"+i]=CONFIG.safety[i]; } })();
+
+/* =========================================================
+   INIT
+   ========================================================= */
+document.addEventListener("DOMContentLoaded",function(){
+  buildForm();
+  wireUI();
+  updateDuration(); checkSafety();
+  $("#demoSummary").textContent=summaryFor(DEMO);
+
+  $("#saveBtn").addEventListener("click",doSave);
+  $("#genBtn").addEventListener("click",doGenerate);
+  $("#clearBtn").addEventListener("click",function(){ if(confirm("Clear the form? Unsaved entries will be lost.")) clearForm(); });
+  $("#copyBtn").addEventListener("click",doCopy);
+  $("#pdfBtn").addEventListener("click",doPDF);
+  $("#emailBtn").addEventListener("click",doEmail);
+  $("#loadDemoBtn").addEventListener("click",function(){ goTab("log"); fillForm(DEMO); $('[name="editingId"]').value=""; toast("Example loaded — explore the sections."); });
+});
+</script>
+</body>
+</html>
