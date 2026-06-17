@@ -137,6 +137,27 @@ footer{border-top:1px solid var(--line);background:#fff;padding:22px 0;font-size
 footer a{color:var(--navy);font-weight:600}
 .foot-grid{display:flex;gap:22px;flex-wrap:wrap;justify-content:space-between}
 @media print{nav.tabs,header,.btn-row,footer,.no-print{display:none!important}.panel{display:block!important}}
+
+/* per-question note */
+.yn-block{display:block}
+.yn-note{min-height:0!important;height:42px;margin-top:7px;font-size:.88rem;background:#fbfcfe}
+.yn-note:focus{height:74px}
+
+/* body map */
+.bm-intro{font-size:.86rem;color:var(--muted);margin:0 0 12px}
+.bm-figs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 0 14px}
+.bm-fig{border:1px solid var(--line);border-radius:12px;background:#fbfcfe;padding:8px;text-align:center}
+.bm-fig h4{margin:2px 0 6px;font-size:.85rem;color:var(--navy);font-weight:600}
+.bm-fig svg{width:100%;height:auto;max-height:330px;cursor:crosshair;touch-action:manipulation}
+.bm-fig .body{fill:#e7edf6;stroke:#9fb2d0;stroke-width:1.5}
+.bm-pin circle{fill:var(--danger);stroke:#fff;stroke-width:2}
+.bm-pin text{fill:#fff;font-size:11px;font-weight:700;text-anchor:middle;dominant-baseline:central;font-family:Inter,sans-serif}
+.bm-row{display:flex;align-items:center;gap:10px;margin:0 0 8px}
+.bm-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--danger);color:#fff;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.bm-view{flex:0 0 auto;font-size:.74rem;font-weight:600;color:var(--muted);text-transform:capitalize;width:44px}
+.bm-row input{flex:1}
+.bm-del{flex:0 0 auto;border:none;background:#fdecea;color:var(--danger);width:30px;height:30px;border-radius:8px;font-size:1.15rem;font-weight:700;cursor:pointer;line-height:1}
+.bm-tools{display:flex;gap:10px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -318,6 +339,44 @@ footer a{color:var(--navy);font-weight:600}
       <label class="fld" style="margin-top:6px"><span>Manager decision</span></label>
       <div class="checks" id="mgrDecision"></div>
       <label class="fld" style="margin-top:12px"><span>Lessons learned</span><textarea name="mgrLessons"></textarea></label>
+    </div>
+  </div>
+
+  <!-- 13 Body map -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">13</span>Body map &mdash; marks &amp; injuries</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <p class="bm-intro">If the person supported (or a staff member) has any mark, bruise, redness, scratch, swelling or injury, tap on the body where it is &mdash; a numbered pin appears, then describe each one below. Record marks even if they seem minor. Use both the front and back figures.</p>
+      <div class="bm-figs">
+        <div class="bm-fig"><h4>Front</h4><svg id="bmFront" viewBox="0 0 200 440" data-view="front" xmlns="http://www.w3.org/2000/svg"><path class="body" d="M100,20 C85,20 73,32 73,47 C73,57 78,66 86,71 C70,75 56,85 50,103 C44,121 42,160 42,185 C42,195 56,195 57,185 C58,168 60,150 64,138 C64,165 60,200 60,230 C60,250 58,300 60,340 C61,370 64,400 68,418 C71,432 90,432 91,416 L96,330 C97,322 103,322 104,330 L109,416 C110,432 129,432 132,418 C136,400 139,370 140,340 C142,300 140,250 140,230 C140,200 136,165 136,138 C140,150 142,168 143,185 C144,195 158,195 158,185 C158,160 156,121 150,103 C144,85 130,75 114,71 C122,66 127,57 127,47 C127,32 115,20 100,20 Z"/><g id="bmPins_front"></g></svg></div>
+        <div class="bm-fig"><h4>Back</h4><svg id="bmBack" viewBox="0 0 200 440" data-view="back" xmlns="http://www.w3.org/2000/svg"><path class="body" d="M100,20 C85,20 73,32 73,47 C73,57 78,66 86,71 C70,75 56,85 50,103 C44,121 42,160 42,185 C42,195 56,195 57,185 C58,168 60,150 64,138 C64,165 60,200 60,230 C60,250 58,300 60,340 C61,370 64,400 68,418 C71,432 90,432 91,416 L96,330 C97,322 103,322 104,330 L109,416 C110,432 129,432 132,418 C136,400 139,370 140,340 C142,300 140,250 140,230 C140,200 136,165 136,138 C140,150 142,168 143,185 C144,195 158,195 158,185 C158,160 156,121 150,103 C144,85 130,75 114,71 C122,66 127,57 127,47 C127,32 115,20 100,20 Z"/><g id="bmPins_back"></g></svg></div>
+      </div>
+      <div id="bmList"></div>
+      <div class="bm-tools"><button type="button" class="btn btn-ghost" id="bmClear">Clear all marks</button></div>
+      <div class="grid2" style="margin-top:14px">
+        <label class="fld"><span>Whose body is recorded above?</span><input type="text" name="bodyMapWho" placeholder="e.g. person supported (initials) / staff member"></label>
+        <label class="fld"><span>Who checked for injuries, and when?</span><input type="text" name="bodyMapCheckedBy" placeholder="e.g. checked by J.S. at 14:20"></label>
+      </div>
+      <input type="hidden" name="bodyMap" value="">
+    </div>
+  </div>
+
+  <!-- 14 Reference numbers -->
+  <div class="card collapsed" data-card>
+    <div class="card-head"><h3><span class="num">14</span>Reference numbers</h3><span class="chev">&#9660;</span></div>
+    <div class="card-body">
+      <p class="hint">Record any reference numbers given when you report or notify professionals. Leave blank if not applicable.</p>
+      <div class="grid2">
+        <label class="fld"><span>Internal incident / log reference</span><input type="text" name="ref_internal"></label>
+        <label class="fld"><span>LADO referral reference</span><input type="text" name="ref_lado"></label>
+        <label class="fld"><span>Local authority / social care reference</span><input type="text" name="ref_la"></label>
+        <label class="fld"><span>Social worker name &amp; reference</span><input type="text" name="ref_socialworker"></label>
+        <label class="fld"><span>Safeguarding referral reference</span><input type="text" name="ref_safeguarding"></label>
+        <label class="fld"><span>CQC notification reference</span><input type="text" name="ref_cqc"></label>
+        <label class="fld"><span>Ofsted notification reference</span><input type="text" name="ref_ofsted"></label>
+        <label class="fld"><span>Police reference (CAD / crime number)</span><input type="text" name="ref_police"></label>
+        <label class="fld"><span>Other reference</span><input type="text" name="ref_other"></label>
+      </div>
     </div>
   </div>
 
@@ -559,13 +618,16 @@ function uid(){return "e"+Date.now()+Math.floor(Math.random()*1000);}
 
 /* ---------- yes/no control ---------- */
 function ynControl(name){
+  var block=el("div",{"class":"yn-block"});
   var wrap=el("div",{"class":"yn","data-yn":name});
   ["Yes","No"].forEach(function(v){
     var lab=el("label");
     lab.innerHTML='<input type="radio" name="'+name+'" value="'+v+'"><span>'+v+'</span>';
     wrap.appendChild(lab);
   });
-  return wrap;
+  block.appendChild(wrap);
+  block.appendChild(el("textarea",{name:name+"_note","class":"yn-note",placeholder:"Add detail / notes (optional)"}));
+  return block;
 }
 
 /* =========================================================
@@ -623,6 +685,77 @@ function buildChecks(sel,prefix,items,isSafety){
   });
 }
 function fillYn(name){ $('[data-yn="'+name+'"]').replaceWith(ynControl(name)); }
+
+/* =========================================================
+   BODY MAP
+   ========================================================= */
+var SVGNS="http://www.w3.org/2000/svg";
+var BODY_PATH="M100,20 C85,20 73,32 73,47 C73,57 78,66 86,71 C70,75 56,85 50,103 C44,121 42,160 42,185 C42,195 56,195 57,185 C58,168 60,150 64,138 C64,165 60,200 60,230 C60,250 58,300 60,340 C61,370 64,400 68,418 C71,432 90,432 91,416 L96,330 C97,322 103,322 104,330 L109,416 C110,432 129,432 132,418 C136,400 139,370 140,340 C142,300 140,250 140,230 C140,200 136,165 136,138 C140,150 142,168 143,185 C144,195 158,195 158,185 C158,160 156,121 150,103 C144,85 130,75 114,71 C122,66 127,57 127,47 C127,32 115,20 100,20 Z";
+var bodyMarks=[];
+function bmSync(){ var h=$('[name="bodyMap"]'); if(h) h.value=JSON.stringify(bodyMarks); }
+function bmRenumber(){ bodyMarks.forEach(function(m,i){ m.n=i+1; }); }
+function bmRenderPins(){
+  ["front","back"].forEach(function(v){
+    var layer=document.getElementById("bmPins_"+v); if(!layer) return; layer.innerHTML="";
+    bodyMarks.filter(function(m){return m.view===v;}).forEach(function(m){
+      var g=document.createElementNS(SVGNS,"g"); g.setAttribute("class","bm-pin");
+      var c=document.createElementNS(SVGNS,"circle"); c.setAttribute("cx",m.x); c.setAttribute("cy",m.y); c.setAttribute("r",11);
+      var t=document.createElementNS(SVGNS,"text"); t.setAttribute("x",m.x); t.setAttribute("y",m.y); t.textContent=m.n;
+      g.appendChild(c); g.appendChild(t); layer.appendChild(g);
+    });
+  });
+}
+function bmRenderList(){
+  var list=$("#bmList"); if(!list) return; list.innerHTML="";
+  if(bodyMarks.length===0){ list.innerHTML='<p class="hint">No marks added yet. Tap on a figure above to add one.</p>'; return; }
+  bodyMarks.forEach(function(m,i){
+    var row=el("div",{"class":"bm-row"});
+    row.appendChild(el("span",{"class":"bm-num"},String(m.n)));
+    row.appendChild(el("span",{"class":"bm-view"},m.view));
+    var inp=el("input",{type:"text",placeholder:"Describe the mark (type, size, colour, location)"}); inp.value=m.desc||"";
+    inp.addEventListener("input",function(){ m.desc=inp.value; bmSync(); });
+    row.appendChild(inp);
+    var del=el("button",{type:"button","class":"bm-del"},"\u00d7");
+    del.addEventListener("click",function(){ bodyMarks.splice(i,1); bmRenumber(); bmRender(); });
+    row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+function bmRender(){ bmRenderPins(); bmRenderList(); bmSync(); }
+function bmAdd(view,x,y){ bodyMarks.push({n:bodyMarks.length+1,view:view,x:Math.round(x),y:Math.round(y),desc:""}); bmRender(); }
+function bmPoint(svg,evt){
+  if(!svg.createSVGPoint) return null;
+  var pt=svg.createSVGPoint(); pt.x=evt.clientX; pt.y=evt.clientY;
+  var ctm=svg.getScreenCTM(); if(!ctm) return null;
+  return pt.matrixTransform(ctm.inverse());
+}
+function bmInit(){
+  ["bmFront","bmBack"].forEach(function(id){
+    var svg=document.getElementById(id); if(!svg) return;
+    svg.addEventListener("click",function(evt){
+      var p=bmPoint(svg,evt); if(!p) return;
+      bmAdd(svg.getAttribute("data-view"),p.x,p.y);
+    });
+  });
+  var clr=$("#bmClear");
+  if(clr) clr.addEventListener("click",function(){ if(bodyMarks.length&&!confirm("Remove all body-map marks?")) return; bodyMarks=[]; bmRender(); });
+  bmRender();
+}
+function bmFigureSVG(view,x,y0,scale,fw){
+  var s='<text x="'+(x+fw/2)+'" y="'+(y0-12)+'" text-anchor="middle" font-size="20" font-weight="700" fill="#1c3d72" font-family="Inter,sans-serif">'+(view==="front"?"Front":"Back")+'</text>';
+  s+='<g transform="translate('+x+','+y0+') scale('+scale+')">';
+  s+='<path d="'+BODY_PATH+'" fill="#e7edf6" stroke="#9fb2d0" stroke-width="1.5"/>';
+  bodyMarks.filter(function(m){return m.view===view;}).forEach(function(m){
+    s+='<circle cx="'+m.x+'" cy="'+m.y+'" r="11" fill="#c0392b" stroke="#fff" stroke-width="2"/>';
+    s+='<text x="'+m.x+'" y="'+m.y+'" fill="#fff" font-size="11" font-weight="700" text-anchor="middle" dominant-baseline="central" font-family="Inter,sans-serif">'+m.n+'</text>';
+  });
+  s+='</g>';
+  return s;
+}
+function bmSVGString(){
+  var W=1040,H=620,fw=236,scale=1.18,y0=86,x0=120,x1=506;
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'"><rect width="'+W+'" height="'+H+'" fill="#ffffff"/>'+bmFigureSVG("front",x0,y0,scale,fw)+bmFigureSVG("back",x1,y0,scale,fw)+'</svg>';
+}
 
 /* =========================================================
    COLLAPSE / EXPAND CARDS + TABS
@@ -693,12 +826,15 @@ function fillForm(o){
     else if(inp.type==="radio"){ inp.checked = (o[inp.name]===inp.value); }
     else inp.value=o[inp.name];
   });
+  try{ bodyMarks = JSON.parse(o.bodyMap||"[]")||[]; }catch(e){ bodyMarks=[]; }
+  if(typeof bmRender==="function") bmRender();
   updateDuration(); checkSafety();
 }
 function clearForm(){
   $("#logForm").reset();
   $('[name="editingId"]').value="";
   $('[name="durationText"]').dataset.mins="";
+  bodyMarks=[]; if(typeof bmRender==="function") bmRender();
   updateDuration(); checkSafety();
   $("#summaryCard").style.display="none";
 }
@@ -759,7 +895,7 @@ function summaryFor(o){
   L.push("");
   L.push("AFTERCARE");
   var acLines=[];
-  CONFIG.aftercare.forEach(function(q){ if(o["ac_"+q[0]]) acLines.push(q[1]+" "+o["ac_"+q[0]]); });
+  CONFIG.aftercare.forEach(function(q){ if(o["ac_"+q[0]]){ var n=o["ac_"+q[0]+"_note"]; acLines.push(q[1]+" "+o["ac_"+q[0]]+(n?" — "+n:"")); } });
   L.push(acLines.length? acLines.join("  ") : "Aftercare to be confirmed.");
   L.push("");
   L.push("NOTIFICATIONS");
@@ -767,19 +903,36 @@ function summaryFor(o){
   [["police","Police"],["medical","Medical attention"],["injury","Injury reported"],
    ["safeguarding","Safeguarding concern"],["regNotification","Regulation notification"],
    ["parentInformed","Parent/carer/social worker informed"],["managerInformed","Manager informed"]]
-   .forEach(function(p){ if(o[p[0]]) notif.push(p[1]+": "+o[p[0]]); });
+   .forEach(function(p){ if(o[p[0]]){ var n=o[p[0]+"_note"]; notif.push(p[1]+": "+o[p[0]]+(n?" ("+n+")":"")); } });
   L.push(notif.length? notif.join("  •  ") : "None recorded.");
   L.push("");
   L.push("MANAGER REVIEW & LEARNING");
   if(o.mgrName) L.push("Reviewed by "+o.mgrName+(o.mgrDate?" on "+o.mgrDate:"")+".");
   var mgrFlags=[];
-  CONFIG.mgrQuestions.forEach(function(q){ if(o["mq_"+q[0]]) mgrFlags.push(q[1]+" "+o["mq_"+q[0]]); });
+  CONFIG.mgrQuestions.forEach(function(q){ if(o["mq_"+q[0]]){ var n=o["mq_"+q[0]+"_note"]; mgrFlags.push(q[1]+" "+o["mq_"+q[0]]+(n?" — "+n:"")); } });
   if(mgrFlags.length) L.push(mgrFlags.join("  "));
   var dec=gatherFrom(o,"md_"); if(dec.length) L.push("Decision: "+dec.join(", ")+".");
   if(o.mgrLessons) L.push("Lessons learned: "+o.mgrLessons);
   L.push("");
   L.push("ACTIONS REQUIRED");
   L.push(dec.length? dec.join(", ") : "To be confirmed by the manager.");
+
+  // body map
+  var marks=[]; try{ marks=JSON.parse(o.bodyMap||"[]")||[]; }catch(e){ marks=[]; }
+  if(marks.length || o.bodyMapWho || o.bodyMapCheckedBy){
+    L.push("");
+    L.push("BODY MAP — MARKS & INJURIES");
+    if(o.bodyMapWho) L.push("Recorded for: "+o.bodyMapWho);
+    if(o.bodyMapCheckedBy) L.push("Checked by: "+o.bodyMapCheckedBy);
+    if(marks.length) marks.forEach(function(m){ L.push("• Mark "+m.n+" ("+m.view+"): "+(m.desc||"[description not added]")); });
+    else L.push("No specific marks plotted on the body map.");
+  }
+
+  // reference numbers
+  var refDefs=[["ref_internal","Internal incident/log"],["ref_lado","LADO referral"],["ref_la","Local authority/social care"],["ref_socialworker","Social worker"],["ref_safeguarding","Safeguarding referral"],["ref_cqc","CQC notification"],["ref_ofsted","Ofsted notification"],["ref_police","Police (CAD/crime)"],["ref_other","Other"]];
+  var refLines=[]; refDefs.forEach(function(r){ if(o[r[0]]) refLines.push("• "+r[1]+": "+o[r[0]]); });
+  if(refLines.length){ L.push(""); L.push("REFERENCE NUMBERS"); refLines.forEach(function(x){ L.push(x); }); }
+
   L.push("");
   L.push("— Physical intervention was used only as a last resort, when necessary, proportionate and the least restrictive option. Staff used only techniques they are trained and assessed as competent to use. —");
   return L.join("\n");
@@ -829,8 +982,28 @@ function doPDF(){
     if(y>790){ doc.addPage(); y=54; }
     doc.text(ln,margin,y); y+=14;
   });
-  doc.save("restraint-log-summary.pdf");
-  toast("PDF downloaded.");
+  function finish(){ doc.save("restraint-log-summary.pdf"); toast("PDF downloaded."); }
+  if(bodyMarks.length){
+    try{
+      var img=new Image();
+      img.onload=function(){
+        try{
+          var canvas=el("canvas"); canvas.width=1040; canvas.height=620;
+          var ctx=canvas.getContext("2d"); ctx.fillStyle="#fff"; ctx.fillRect(0,0,1040,620);
+          ctx.drawImage(img,0,0,1040,620);
+          doc.addPage();
+          doc.setFont("helvetica","bold"); doc.setFontSize(13);
+          doc.text("Body map — marks & injuries",margin,54);
+          doc.addImage(canvas.toDataURL("image/png"),"PNG",margin,72,503,300);
+        }catch(e){}
+        finish();
+      };
+      img.onerror=finish;
+      img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(bmSVGString());
+      return;
+    }catch(e){ finish(); return; }
+  }
+  finish();
 }
 function doEmail(){
   var txt=$("#summaryText").textContent;
@@ -992,6 +1165,7 @@ var DEMO={
 document.addEventListener("DOMContentLoaded",function(){
   buildForm();
   wireUI();
+  bmInit();
   updateDuration(); checkSafety();
   $("#demoSummary").textContent=summaryFor(DEMO);
 
